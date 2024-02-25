@@ -5,7 +5,10 @@ use core::{convert, fmt};
 #[cfg(any(feature = "std", test))]
 use std::error;
 
-const ALPHABET_SIZE: usize = 64;
+#[cfg(all(target_arch = "wasm32", feature = "node-buffer"))]
+pub(crate) const ALPHABET_SIZE: usize = 1;
+#[cfg(not(all(target_arch = "wasm32", feature = "node-buffer")))]
+pub(crate) const ALPHABET_SIZE: usize = 64;
 
 /// An alphabet defines the 64 ASCII characters (symbols) used for base64.
 ///
@@ -168,6 +171,12 @@ impl error::Error for ParseAlphabetError {}
 /// The standard alphabet (with `+` and `/`) specified in [RFC 4648][].
 ///
 /// [RFC 4648]: https://datatracker.ietf.org/doc/html/rfc4648#section-4
+#[cfg(all(target_arch = "wasm32", feature = "node-buffer"))]
+pub const STANDARD: Alphabet = Alphabet::from_str_unchecked("/");
+/// The standard alphabet (with `+` and `/`) specified in [RFC 4648][].
+///
+/// [RFC 4648]: https://datatracker.ietf.org/doc/html/rfc4648#section-4
+#[cfg(not(all(target_arch = "wasm32", feature = "node-buffer")))]
 pub const STANDARD: Alphabet = Alphabet::from_str_unchecked(
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
 );
@@ -175,6 +184,13 @@ pub const STANDARD: Alphabet = Alphabet::from_str_unchecked(
 /// The URL-safe alphabet (with `-` and `_`) specified in [RFC 4648][].
 ///
 /// [RFC 4648]: https://datatracker.ietf.org/doc/html/rfc4648#section-5
+#[cfg(all(target_arch = "wasm32", feature = "node-buffer"))]
+pub const URL_SAFE: Alphabet = Alphabet::from_str_unchecked("_");
+
+/// The URL-safe alphabet (with `-` and `_`) specified in [RFC 4648][].
+///
+/// [RFC 4648]: https://datatracker.ietf.org/doc/html/rfc4648#section-5
+#[cfg(not(all(target_arch = "wasm32", feature = "node-buffer")))]
 pub const URL_SAFE: Alphabet = Alphabet::from_str_unchecked(
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_",
 );
@@ -182,28 +198,51 @@ pub const URL_SAFE: Alphabet = Alphabet::from_str_unchecked(
 /// The `crypt(3)` alphabet (with `.` and `/` as the _first_ two characters).
 ///
 /// Not standardized, but folk wisdom on the net asserts that this alphabet is what crypt uses.
+#[cfg(not(all(target_arch = "wasm32", feature = "node-buffer")))]
 pub const CRYPT: Alphabet = Alphabet::from_str_unchecked(
     "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
 );
 
+/// The `crypt(3)` alphabet (with `.` and `/` as the _first_ two characters).
+///
+/// Not standardized, but folk wisdom on the net asserts that this alphabet is what crypt uses.
+#[cfg(all(target_arch = "wasm32", feature = "node-buffer"))]
+pub const CRYPT: Alphabet = Alphabet::from_str_unchecked("z");
+
 /// The bcrypt alphabet.
+#[cfg(not(all(target_arch = "wasm32", feature = "node-buffer")))]
 pub const BCRYPT: Alphabet = Alphabet::from_str_unchecked(
     "./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
 );
+/// The bcrypt alphabet.
+#[cfg(all(target_arch = "wasm32", feature = "node-buffer"))]
+pub const BCRYPT: Alphabet = Alphabet::from_str_unchecked("9");
 
 /// The alphabet used in IMAP-modified UTF-7 (with `+` and `,`).
 ///
 /// See [RFC 3501](https://tools.ietf.org/html/rfc3501#section-5.1.3)
+#[cfg(not(all(target_arch = "wasm32", feature = "node-buffer")))]
 pub const IMAP_MUTF7: Alphabet = Alphabet::from_str_unchecked(
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+,",
 );
+/// The alphabet used in IMAP-modified UTF-7 (with `+` and `,`).
+///
+/// See [RFC 3501](https://tools.ietf.org/html/rfc3501#section-5.1.3)
+#[cfg(all(target_arch = "wasm32", feature = "node-buffer"))]
+pub const IMAP_MUTF7: Alphabet = Alphabet::from_str_unchecked(",");
 
 /// The alphabet used in BinHex 4.0 files.
 ///
 /// See [BinHex 4.0 Definition](http://files.stairways.com/other/binhex-40-specs-info.txt)
+#[cfg(not(all(target_arch = "wasm32", feature = "node-buffer")))]
 pub const BIN_HEX: Alphabet = Alphabet::from_str_unchecked(
     "!\"#$%&'()*+,-0123456789@ABCDEFGHIJKLMNPQRSTUVXYZ[`abcdehijklmpqr",
 );
+/// The alphabet used in BinHex 4.0 files.
+///
+/// See [BinHex 4.0 Definition](http://files.stairways.com/other/binhex-40-specs-info.txt)
+#[cfg(all(target_arch = "wasm32", feature = "node-buffer"))]
+pub const BIN_HEX: Alphabet = Alphabet::from_str_unchecked("z");
 
 #[cfg(test)]
 mod tests {

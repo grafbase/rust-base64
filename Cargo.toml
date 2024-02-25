@@ -14,6 +14,10 @@ edition = "2018"
 # This option was added in 1.56, keep it for when we bump MSRV.
 rust-version = "1.48.0"
 
+[dependencies]
+js-sys = { version = "0.3", optional = true }
+wasm-bindgen = { version = "0.2.91", optional = true }
+
 [[bench]]
 name = "benchmarks"
 harness = false
@@ -48,6 +52,7 @@ once_cell = "1"
 
 [features]
 default = ["std"]
+node-buffer = ["js-sys", "wasm-bindgen"]
 alloc = []
 std = ["alloc"]
 

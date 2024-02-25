@@ -11,6 +11,11 @@ use alloc::vec::Vec;
 #[cfg(any(feature = "alloc", test))]
 use alloc::{string::String, vec};
 
+#[cfg(all(target_arch = "wasm32", feature = "node-buffer"))]
+pub mod node_buffer;
+#[cfg(all(target_arch = "wasm32", feature = "node-buffer"))]
+pub use node_buffer as general_purpose;
+#[cfg(not(all(target_arch = "wasm32", feature = "node-buffer")))]
 pub mod general_purpose;
 
 #[cfg(test)]
@@ -457,6 +462,7 @@ pub struct DecodeMetadata {
 }
 
 impl DecodeMetadata {
+    #[allow(dead_code)]
     pub(crate) fn new(decoded_bytes: usize, padding_index: Option<usize>) -> Self {
         Self {
             decoded_len: decoded_bytes,
